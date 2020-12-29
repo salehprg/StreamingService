@@ -58,6 +58,31 @@ namespace streamingservice.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> EndStream(string roomId)
+        {
+            try
+            {
+                UserModel owner = userService.GetUserModel(User);   
+                Meeting meeting = appDbContext.Meetings.Where(x => x.MeetingId == roomId && x.OwnerId == owner.Id).FirstOrDefault();
+
+                if(meeting == null)
+                    return BadRequest("شما اجازه بستن این اتاق را ندارید");
+
+                bool result = await StreamService.EndRoom(roomId);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
+
+                return BadRequest(false);
+                throw;
+            }
+        }
+
+        [HttpPost]
         [Authorize(Roles = Roles.Admin + "," + Roles.User + "," + Roles.Trial)]
         public async Task<IActionResult> AddServiceInfo([FromBody]MeetingServicesModel servicesModel)
         {
