@@ -11,6 +11,7 @@ namespace streamingservice.Helper
         //------------------------------
         //React Env Variables
         public static string ConnectionDb { get; set; }
+        public static string JWTSecret { get; set; }
 
     }
 }

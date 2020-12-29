@@ -39,10 +39,37 @@ namespace Models.User
             }
             catch (Exception ex)
             {
-                
+                return new List<int>();
                 throw;
             }
         }
+    
+        public string SetServiceList(List<int> serviceIds)
+        {
+            try
+            {
+                string ids = "";
+
+                foreach (var id in serviceIds)
+                {
+                    if(id != 0)
+                    {
+                        ids += id.ToString() + ",";
+                    }
+                }
+
+                ServiceIds = ids;
+                return ids;
+            }
+            catch (Exception ex)
+            {
+                return null;
+                throw;
+            }
+        }
+    
+    
+    
     }
 
 }

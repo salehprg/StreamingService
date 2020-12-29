@@ -26,7 +26,7 @@ public class UserService {
         try
         {
             string idNumber = userManager.GetUserId(User);
-            UserModel userModel = appDbContext.Users.Where(x => x.MelliCode == idNumber).FirstOrDefault();
+            UserModel userModel = appDbContext.Users.Where(x => x.UserName == idNumber).FirstOrDefault();
 
             if(userModel != null)
             {

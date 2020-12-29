@@ -229,5 +229,3 @@ _Pvt_Extensions
 .paket/paket.exe
 
 # FAKE - F# Make
-.fake/
-src/Presentation/Virgol.School/.vscode/settings.json

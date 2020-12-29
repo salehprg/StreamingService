@@ -21,7 +21,7 @@ namespace Models
         {
             base.OnModelCreating(builder);
 
-             builder.Entity<Meeting>()
+            builder.Entity<Meeting>()
                 .HasOne<UserModel>()
                 .WithMany()
                 .HasForeignKey(x => x.OwnerId)
