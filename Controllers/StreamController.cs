@@ -10,6 +10,7 @@ using Models;
 using Models.User;
 using Models.Users.Roles;
 using streamingservice.Helper;
+using streamingservice.Models;
 using streamingservice.Services;
 
 namespace streamingservice.Controllers
@@ -89,10 +90,20 @@ namespace streamingservice.Controllers
             try
             {
                 if(string.IsNullOrEmpty(servicesModel.Service_URL) || string.IsNullOrEmpty(servicesModel.Service_Key))
-                    return BadRequest("اطلاعات به درستی وارد نشده است");
+                    return BadRequest(new Response{
+                        Description = "اطلاعات به درستی وارد نشده است\n Service_URL Or Service_Key Empty",
+                        Status = "Failed"
+                    });
 
                 UserModel owner = userService.GetUserModel(User);
 
+                if(appDbContext.Services.Where(x => x.Service_URL == servicesModel.Service_URL).FirstOrDefault() != null)
+                    return BadRequest(new Response{
+                        Description = "Duplicate ServiceURL",
+                        Status = "Failed"
+                    });
+
+                
                 servicesModel.OwnerId = owner.Id;
                 servicesModel.ServiceType = ServiceType.BBB;
                 
@@ -107,15 +118,20 @@ namespace streamingservice.Controllers
                 
                 await appDbContext.SaveChangesAsync();
 
-                return Ok(servicesModel.Id);
+                return Ok(new Response{
+                        Status = "Success",
+                        Data = servicesModel.Id
+                    });
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
 
-                return BadRequest(-1);
-                throw;
+                return BadRequest(new Response{
+                        Description = "Internal Error",
+                        Status = "Failed"
+                    });
             }
         }
 
@@ -131,7 +147,10 @@ namespace streamingservice.Controllers
                     return Unauthorized();
 
                 if(string.IsNullOrEmpty(userModel.UserName) || string.IsNullOrEmpty(userModel.MelliCode))
-                    return BadRequest("اطلاعات به درستی وارد نشده است");
+                    return BadRequest(new Response{
+                        Description = "اطلاعات به درستی وارد نشده است\n UserName Or MelliCode Empty",
+                        Status = "Failed"
+                    });
 
                 string token = TokenCreator.CreateToken(userModel.UserName , new List<string>{Roles.User});
                 userModel.ConfirmedAcc = true;
@@ -141,13 +160,19 @@ namespace streamingservice.Controllers
                 await appDbContext.Users.AddAsync(userModel);
                 await appDbContext.SaveChangesAsync();
 
-                return Ok(userModel.Token);
+                return Ok(new Response{
+                        Data = userModel.Token,
+                        Status = "Success"
+                    });
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
-                return BadRequest(null);
+                return BadRequest(new Response{
+                        Description = "Internal Error",
+                        Status = "Failed"
+                    });
                 throw;
             }
         }
@@ -160,11 +185,17 @@ namespace streamingservice.Controllers
             {
                 UserModel owner = userService.GetUserModel(User);
 
-                return Ok(appDbContext.Services.Where(x => x.OwnerId == owner.Id).ToList());
+                return Ok(new Response{
+                        Data = appDbContext.Services.Where(x => x.OwnerId == owner.Id).ToList(),
+                        Status = "Success"
+                    });
             }
             catch (Exception ex)
             {
-                return BadRequest("مشکلی در دریافت لیست سرویس های شما بوجود آمد");
+                return BadRequest(new Response{
+                        Description = "Internal Error",
+                        Status = "Failed"
+                    });
                 throw;
             }
         }
