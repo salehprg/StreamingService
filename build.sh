@@ -1,4 +1,4 @@
-sudo git stash
+# sudo git stash
 sudo git pull origin master
 dotnet publish --configuration Release
 sudo systemctl stop kestrel-livestream.service

@@ -33,7 +33,7 @@ namespace streamingservice.Services
 
                 //MeetingsResponse response = await bbbApi.CreateRoom(meetingName , meetingId , "" , 0);
 
-                string mkdir = ShellRunner.Execute("mkdir Rooms/" + meetingId);
+                string mkdir = ShellRunner.Execute("mkdir -p Rooms/" + meetingId);
                 string cp = ShellRunner.Execute("cp docker-compose.yml Rooms/" + meetingId);
 
                 string dockerCompose = File.ReadAllText("./Rooms/" + meetingId + "/docker-compose.yml");
