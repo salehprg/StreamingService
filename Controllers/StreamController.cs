@@ -40,20 +40,34 @@ namespace streamingservice.Controllers
                 MeetingServicesModel servicesModel = appDbContext.Services.Where(x => (x.Id == createRoom.ServiceId || x.Service_URL == createRoom.ServiceURL) && x.OwnerId == owner.Id).FirstOrDefault();
 
                 if(servicesModel == null)
-                    return BadRequest("شما اجازه انتخاب این سرویس را ندارید");
+                    return BadRequest(new Response{
+                        Description = "شما اجازه انتخاب این سرویس را ندارید",
+                        Status = "Failed"
+                    });
 
                 string meetingId = await StreamService.CreateRoom(createRoom.Meetingname , servicesModel , owner.Id);
 
                 if(string.IsNullOrEmpty(meetingId))
-                    return BadRequest(null);
+                    return BadRequest(new Response{
+                        Description = "اتاق مورد نظر وجود ندارد",
+                        Status = "Failed"
+                    });
 
-                return Ok(meetingId);
+                return Ok(new Response{
+                        Status = "Success",
+                        Data = new {
+                            MeetingId = meetingId
+                        }
+                    });
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
-                return BadRequest(null);
+                return BadRequest(new Response{
+                        Description = "Internal Error",
+                        Status = "Failed"
+                    });
                 throw;
             }
         }
@@ -67,18 +81,29 @@ namespace streamingservice.Controllers
                 Meeting meeting = appDbContext.Meetings.Where(x => x.MeetingId == roomId && x.OwnerId == owner.Id).FirstOrDefault();
 
                 if(meeting == null)
-                    return BadRequest("شما اجازه بستن این اتاق را ندارید");
+                    return BadRequest(new Response{
+                        Description = "شما اجازه بستن این اتاق را ندارید",
+                        Status = "Failed"
+                    });
 
                 bool result = await StreamService.EndRoom(roomId);
 
-                return Ok(result);
+                return Ok(new Response{
+                        Status = "Success",
+                        Data = new {
+                            EndResult = result
+                        }
+                    });
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
 
-                return BadRequest(false);
+                return BadRequest(new Response{
+                        Description = "Internal Error",
+                        Status = "Failed"
+                    });
                 throw;
             }
         }
@@ -120,7 +145,9 @@ namespace streamingservice.Controllers
 
                 return Ok(new Response{
                         Status = "Success",
-                        Data = servicesModel.Id
+                        Data = new {
+                            ServiceId = servicesModel.Id
+                        }
                     });
             }
             catch (Exception ex)
@@ -161,7 +188,9 @@ namespace streamingservice.Controllers
                 await appDbContext.SaveChangesAsync();
 
                 return Ok(new Response{
-                        Data = userModel.Token,
+                        Data = new {
+                            Token = userModel.Token
+                        },
                         Status = "Success"
                     });
             }
