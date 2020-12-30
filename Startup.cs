@@ -90,9 +90,11 @@ namespace streamingservice
                 };
             });
 
+            
             if(!Directory.Exists("Rooms"))
             {   
-                Directory.CreateDirectory("Rooms");
+                DirectoryInfo info = Directory.CreateDirectory("Rooms");
+                Console.WriteLine(info.ToString());
             }
 
             services.AddControllers();
