@@ -49,7 +49,7 @@ namespace streamingservice.Controllers
 
                 if(string.IsNullOrEmpty(meetingId))
                     return BadRequest(new Response{
-                        Description = "اتاق مورد نظر وجود ندارد",
+                        Description = "ساخت اتاق مورد نظر با مشکل مواجه شد",
                         Status = "Failed"
                     });
 
