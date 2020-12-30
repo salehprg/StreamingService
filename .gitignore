@@ -21,8 +21,9 @@ build/
 bld/
 bin/
 Bin/
-obj/
 Obj/
+Rooms/
+obj/
 
 # Visual Studio 2015 cache/options directory
 .vs/
@@ -229,3 +230,5 @@ _Pvt_Extensions
 .paket/paket.exe
 
 # FAKE - F# Make
+obj/Debug/netcoreapp3.1/streamingservice.assets.cache
+obj/Debug/netcoreapp3.1/streamingservice.csprojAssemblyReference.cache
