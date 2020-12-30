@@ -63,6 +63,8 @@ namespace streamingservice.Services
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
                 return null;
                 throw;
             }
@@ -87,6 +89,8 @@ namespace streamingservice.Services
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
                 return false;
                 throw;
             }
