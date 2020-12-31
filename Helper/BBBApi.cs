@@ -51,40 +51,8 @@ namespace streamingservice.Helper
                 checkSum = SHA1Creator.sha1Creator(data + bbbSecret);
 
                 Uri uri = new Uri (bbbUrl + modifiedData + "checksum=" + checkSum.ToLower() );
-                if(joinRoom)
-                    return uri.AbsoluteUri;
-
-                HttpResponseMessage response = client.GetAsync(uri).Result;  // Send data then get response
+                return uri.AbsoluteUri;
                 
-
-                try
-                {
-                    if (response.IsSuccessStatusCode)  
-                    {  
-                        XmlDocument xmlResponse = new XmlDocument();
-                        xmlResponse.Load(await response.Content.ReadAsStreamAsync());
-                        string jsonObj = JsonConvert.SerializeXmlNode(xmlResponse , Newtonsoft.Json.Formatting.None , true);
-
-                        if(jsonObj.Contains("?xml"))
-                        {
-                            string[] results = jsonObj.Split("}{");
-
-                            return "{" + results[1];
-                        }
-                        return jsonObj;
-                    }  
-                    else  
-                    {  
-                        Console.WriteLine("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase);  
-                        return "";
-                    } 
-                }
-                catch (System.Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                    Console.WriteLine(ex.StackTrace);
-                    return null;
-                }
             }
             catch
             {
@@ -223,7 +191,7 @@ namespace streamingservice.Helper
                 string password = (teacher ? "password=mp" : "password=ap");
                 fullname = HttpUtility.UrlEncode(fullname).ToUpper();
 
-                string FunctionName = string.Format("join?meetingID={0}&{1}&fullName={2}&redirect=true&userID={3}" , meetingId , password , fullname , userId);
+                string FunctionName = string.Format("join?fullName={2}&meetingID={0}&{1}&redirect=true&userID={3}" , meetingId , password , fullname , userId);
                 string data = FunctionName;
 
                 string url = await sendData(data , true);

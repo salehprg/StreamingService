@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Models;
 using streamingservice.Helper;
@@ -34,22 +35,37 @@ namespace streamingservice.Services
 
                 //MeetingsResponse response = await bbbApi.CreateRoom(meetingName , meetingId , "" , 0);
 
-                //string sudo = ShellRunner.Execute("sudo su");
-                string who = ShellRunner.Execute("whoami");
-                Console.WriteLine(who);
-                string mkdir = ShellRunner.Execute("mkdir -p Rooms/" + meetingId);
-                string cp = ShellRunner.Execute("cp docker-compose.yml Rooms/" + meetingId);
+                string rooms = "";
 
-                string dockerCompose = File.ReadAllText("Rooms/" + meetingId + "/docker-compose.yml");
+                if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    string sudo = ShellRunner.Execute("sudo su");
+                    string who = ShellRunner.Execute("whoami");
+                    Console.WriteLine(who);
+
+                    rooms = "Rooms/";
+                }
+
+                if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                     rooms = "./Rooms/";
+                }
+                
+
+
+                string mkdir = ShellRunner.Execute("mkdir -p " + rooms + meetingId);
+                string cp = ShellRunner.Execute("cp docker-compose.yml " + rooms + meetingId);
+
+                string dockerCompose = File.ReadAllText(rooms + meetingId + "/docker-compose.yml");
 
                 dockerCompose = dockerCompose.Replace("BBBURL" , servicesModel.Service_URL);
                 dockerCompose = dockerCompose.Replace("BBBSECRET" , servicesModel.Service_Key);
                 dockerCompose = dockerCompose.Replace("BBBMEETINGID" , meetingId);
 
-                File.WriteAllText("Rooms/" + meetingId + "/docker-compose.yml" , dockerCompose);
+                File.WriteAllText(rooms + meetingId + "/docker-compose.yml" , dockerCompose);
 
                 // string cd = ShellRunner.Execute(");
-                string dockerUp = ShellRunner.Execute("cd Rooms/" + meetingId + " && docker-compose up -d");
+                string dockerUp = ShellRunner.Execute("cd " + rooms + meetingId + " && docker-compose up -d");
                 await Task.Delay(10000); // Wait 2 seconds without blocking
                 Console.WriteLine(dockerUp);
                 Meeting meeting = new Meeting();

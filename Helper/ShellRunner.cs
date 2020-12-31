@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace streamingservice.Helper
 {
@@ -12,7 +13,19 @@ namespace streamingservice.Helper
             proc.StartInfo.RedirectStandardOutput = true;
             proc.StartInfo.RedirectStandardError = true;
 
-            proc.StartInfo.FileName = "/bin/bash";
+            string fileName = "";
+
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                fileName = "powershell.exe";
+            }
+
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                fileName = "/bin/bash";
+            }
+            
+            proc.StartInfo.FileName = fileName;
             proc.Start();
 
             proc.StandardInput.WriteLine(command);
