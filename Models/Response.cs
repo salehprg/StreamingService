@@ -1,4 +1,4 @@
-namespace streamingservice.Models
+namespace Models
 {
     public class Response
     {

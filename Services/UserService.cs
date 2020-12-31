@@ -45,6 +45,57 @@ public class UserService {
         }
     }
 
+    public async Task<Response> CreateUser(UserModel userModel , string password , List<string> roles)
+    {
+        try
+        {
+            IdentityResult result = await userManager.CreateAsync(userModel , password);
+            if(result.Succeeded)
+            {
+                await userManager.AddToRolesAsync(userModel , roles);
+
+                return new Response{
+                    Data = userModel.Id,
+                    Status = Status.Success
+                };
+            }
+
+            return new Response{
+                Data = result.Errors,
+                Status = Status.Failed
+            };
+        }
+        catch (System.Exception)
+        {
+            
+            throw;
+        }
+    }
+
+    public async Task<Response> RemoveUser(UserModel userModel)
+    {
+        try
+        {
+            IdentityResult result = await userManager.DeleteAsync(userModel);
+            if(result.Succeeded)
+                return new Response{
+                    Data = userModel.Id,
+                    Status = Status.Success
+                };
+
+            return new Response{
+                Data = result.Errors,
+                Status = Status.Failed
+            };
+        }
+        catch (System.Exception)
+        {
+            
+            throw;
+        }
+    }
+
+
 
 #region Roles
     public bool HasRole(UserModel userModel , string RoleName , bool OnlyThisRole = false)

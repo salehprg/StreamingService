@@ -10,7 +10,6 @@ using Models;
 using Models.User;
 using Models.Users.Roles;
 using streamingservice.Helper;
-using streamingservice.Models;
 using streamingservice.Services;
 
 namespace streamingservice.Controllers
@@ -21,6 +20,7 @@ namespace streamingservice.Controllers
     {
         private UserService userService;
         AppDbContext appDbContext;
+        BBBApi bbbApi;
         StreamService StreamService;
 
         public StreamController(AppDbContext _appDbContext , UserManager<UserModel> _userManager)
@@ -47,6 +47,15 @@ namespace streamingservice.Controllers
 
                 string meetingId = await StreamService.CreateRoom(createRoom.Meetingname , servicesModel , owner.Id);
 
+                bbbApi = new BBBApi(appDbContext , servicesModel.Service_URL , servicesModel.Service_Key);
+
+                string moderatorURL = await bbbApi.JoinRoom(true , meetingId , owner.FirstName + " " + owner.LastName , owner.Id.ToString());
+                string attendeeURL = await bbbApi.JoinRoom(false , meetingId ,"User" , "0");
+                string rtmp = "rtmp://live.vir-gol.ir/stream/" + meetingId;
+                string hls = "https://live.vir-gol.ir/hls/" + meetingId + ".m3u8" ;
+                string dash = "https://live.vir-gol.ir/dash/" + meetingId + ".mpd" ;
+
+
                 if(string.IsNullOrEmpty(meetingId))
                     return BadRequest(new Response{
                         Description = "ساخت اتاق مورد نظر با مشکل مواجه شد",
@@ -54,9 +63,15 @@ namespace streamingservice.Controllers
                     });
 
                 return Ok(new Response{
-                        Status = "Success",
+                        Status = Status.Success,
                         Data = new {
-                            MeetingId = meetingId
+                            MeetingId = meetingId,
+                            ModeratorLink = moderatorURL,
+                            attendeeLink = attendeeURL,
+                            rtmpLink = rtmp,
+                            HLSLink = hls,
+                            dashLink = dash
+
                         }
                     });
             }
@@ -72,6 +87,7 @@ namespace streamingservice.Controllers
             }
         }
 
+        
         [HttpPost]
         public async Task<IActionResult> EndStream(string roomId)
         {
@@ -89,7 +105,7 @@ namespace streamingservice.Controllers
                 bool result = await StreamService.EndRoom(roomId);
 
                 return Ok(new Response{
-                        Status = "Success",
+                        Status = Status.Success,
                         Data = new {
                             EndResult = result
                         }
@@ -108,127 +124,6 @@ namespace streamingservice.Controllers
             }
         }
 
-        [HttpPost]
-        [Authorize(Roles = Roles.Admin + "," + Roles.User + "," + Roles.Trial)]
-        public async Task<IActionResult> AddServiceInfo([FromBody]MeetingServicesModel servicesModel)
-        {
-            try
-            {
-                if(string.IsNullOrEmpty(servicesModel.Service_URL) || string.IsNullOrEmpty(servicesModel.Service_Key))
-                    return BadRequest(new Response{
-                        Description = "اطلاعات به درستی وارد نشده است\n Service_URL Or Service_Key Empty",
-                        Status = "Failed"
-                    });
 
-                UserModel owner = userService.GetUserModel(User);
-
-                if(appDbContext.Services.Where(x => x.Service_URL == servicesModel.Service_URL).FirstOrDefault() != null)
-                    return BadRequest(new Response{
-                        Description = "Duplicate ServiceURL",
-                        Status = "Failed"
-                    });
-
-                
-                servicesModel.OwnerId = owner.Id;
-                servicesModel.ServiceType = ServiceType.BBB;
-                
-                await appDbContext.Services.AddAsync(servicesModel);
-                await appDbContext.SaveChangesAsync();
-                
-                List<int> ids = owner.GetServiceList();
-                ids.Add(servicesModel.Id);
-
-                owner.SetServiceList(ids);
-                appDbContext.Users.Update(owner);
-                
-                await appDbContext.SaveChangesAsync();
-
-                return Ok(new Response{
-                        Status = "Success",
-                        Data = new {
-                            ServiceId = servicesModel.Id
-                        }
-                    });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                Console.WriteLine(ex.StackTrace);
-
-                return BadRequest(new Response{
-                        Description = "Internal Error",
-                        Status = "Failed"
-                    });
-            }
-        }
-
-        [HttpPost]
-        [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> AddNewUser([FromBody]UserModel userModel)
-        {
-            try
-            {
-                UserModel owner = userService.GetUserModel(User);   
-
-                if(owner.UserName != "admin")
-                    return Unauthorized();
-
-                if(string.IsNullOrEmpty(userModel.UserName) || string.IsNullOrEmpty(userModel.MelliCode))
-                    return BadRequest(new Response{
-                        Description = "اطلاعات به درستی وارد نشده است\n UserName Or MelliCode Empty",
-                        Status = "Failed"
-                    });
-
-                string token = TokenCreator.CreateToken(userModel.UserName , new List<string>{Roles.User});
-                userModel.ConfirmedAcc = true;
-                userModel.Token = token;
-                
-
-                await appDbContext.Users.AddAsync(userModel);
-                await appDbContext.SaveChangesAsync();
-
-                return Ok(new Response{
-                        Data = new {
-                            Token = userModel.Token
-                        },
-                        Status = "Success"
-                    });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                Console.WriteLine(ex.StackTrace);
-                return BadRequest(new Response{
-                        Description = "Internal Error",
-                        Status = "Failed"
-                    });
-                throw;
-            }
-        }
-
-        [HttpGet]
-        [Authorize(Roles = Roles.Admin + "," + Roles.User + "," + Roles.Trial)]
-        public IActionResult GetServicesList()
-        {
-            try
-            {
-                UserModel owner = userService.GetUserModel(User);
-
-                return Ok(new Response{
-                        Data = appDbContext.Services.Where(x => x.OwnerId == owner.Id).ToList(),
-                        Status = "Success"
-                    });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new Response{
-                        Description = "Internal Error",
-                        Status = "Failed"
-                    });
-                throw;
-            }
-        }
-    
-    
     }
 }
