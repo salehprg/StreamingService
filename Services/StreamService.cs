@@ -24,7 +24,8 @@ namespace streamingservice.Services
 
                 do
                 {
-                    meetingId = RandomPassword.GenerateGUID(true , true , true);
+                    // meetingId = RandomPassword.GenerateGUID(true , true , true);
+                    meetingId = Path.GetRandomFileName().Replace(".", "").Substring(0, 8);
                     meetingDuplicate = appDbContext.Meetings.Where(x => x.MeetingId == meetingId).FirstOrDefault();
 
                 }while(meetingDuplicate != null);
@@ -33,20 +34,24 @@ namespace streamingservice.Services
 
                 //MeetingsResponse response = await bbbApi.CreateRoom(meetingName , meetingId , "" , 0);
 
-                string mkdir = ShellRunner.Execute("mkdir Rooms/" + meetingId);
+                //string sudo = ShellRunner.Execute("sudo su");
+                string who = ShellRunner.Execute("whoami");
+                Console.WriteLine(who);
+                string mkdir = ShellRunner.Execute("mkdir -p Rooms/" + meetingId);
                 string cp = ShellRunner.Execute("cp docker-compose.yml Rooms/" + meetingId);
 
-                string dockerCompose = File.ReadAllText("./Rooms/" + meetingId + "/docker-compose.yml");
+                string dockerCompose = File.ReadAllText("Rooms/" + meetingId + "/docker-compose.yml");
 
                 dockerCompose = dockerCompose.Replace("BBBURL" , servicesModel.Service_URL);
                 dockerCompose = dockerCompose.Replace("BBBSECRET" , servicesModel.Service_Key);
                 dockerCompose = dockerCompose.Replace("BBBMEETINGID" , meetingId);
 
-                File.WriteAllText("./Rooms/" + meetingId + "/docker-compose.yml" , dockerCompose);
+                File.WriteAllText("Rooms/" + meetingId + "/docker-compose.yml" , dockerCompose);
 
-                string cd = ShellRunner.Execute("cd Rooms/" + meetingId);
-                string dockerUp = ShellRunner.Execute("docker-compose up -d");
-
+                // string cd = ShellRunner.Execute(");
+                string dockerUp = ShellRunner.Execute("cd Rooms/" + meetingId + " && docker-compose up -d");
+                await Task.Delay(10000); // Wait 2 seconds without blocking
+                Console.WriteLine(dockerUp);
                 Meeting meeting = new Meeting();
                 meeting.StartTime = MyDateTime.Now();
                 meeting.MeetingName = meetingName;
@@ -63,6 +68,8 @@ namespace streamingservice.Services
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
                 return null;
                 throw;
             }
@@ -87,6 +94,8 @@ namespace streamingservice.Services
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
                 return false;
                 throw;
             }

@@ -6,7 +6,7 @@ version: '3.3'
 services:
   bbb-streamer:
     image: goldenstarc/bigbluebutton-livestreaming
-    container_name: liveStreaming
+    container_name: liveStreaming-BBBMEETINGID
     environment:
       # BigBlueButton Server url:
       - BBB_URL=BBBURL
@@ -27,7 +27,7 @@ services:
       # play intro file (can be a local file in videodata folder e.g. /video/intro.mp4 or a url of a mediastream e.g. https://my.intro.stream)
       - BBB_INTRO=false
       # begin the intro at position (optional, e.g. 00:00:05)
-      - BBB_BEGIN_INTRO_AT=04:40
+      - BBB_BEGIN_INTRO_AT=
       # end intro after (optional, e.g. 01:00:00 - after one hour)
       - BBB_END_INTRO_AT=
       # Live stream agent username
