@@ -12,7 +12,7 @@ namespace streamingservice.Helper
             proc.StartInfo.RedirectStandardOutput = true;
             proc.StartInfo.RedirectStandardError = true;
 
-            proc.StartInfo.FileName = "powershell.exe";
+            proc.StartInfo.FileName = "/bin/bash";
             proc.Start();
 
             proc.StandardInput.WriteLine(command);
