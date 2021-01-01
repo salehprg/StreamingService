@@ -86,8 +86,30 @@ namespace streamingservice.Controllers
                 throw;
             }
         }
-
         
+        [HttpGet]
+        public IActionResult GetStreams(bool ActiveStream)
+        {
+            try
+            {
+                UserModel userModel = userService.GetUserModel(User);
+
+                List<Meeting> meetings = appDbContext.Meetings.Where(x => x.Finished == !ActiveStream && x.OwnerId == userModel.Id).ToList();
+
+                return Ok(new Response {
+                    Data = meetings,
+                    Status = Status.Success
+                });
+            }
+            catch (System.Exception)
+            {
+                return BadRequest(new Response {
+                    Description = "Internal Error",
+                    Status = Status.Failed
+                });
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> EndStream(string roomId)
         {

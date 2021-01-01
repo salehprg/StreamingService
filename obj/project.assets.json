@@ -6113,19 +6113,23 @@
     ]
   },
   "packageFolders": {
-    "/root/.nuget/packages/": {}
+    "C:\\Users\\saleh\\.nuget\\packages\\": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/root/streamingservice/streamingservice.csproj",
+      "projectUniqueName": "D:\\Project\\VSCode\\LMS Moodle\\streamingservice\\streamingservice.csproj",
       "projectName": "streamingservice",
-      "projectPath": "/root/streamingservice/streamingservice.csproj",
-      "packagesPath": "/root/.nuget/packages/",
-      "outputPath": "/root/streamingservice/obj/",
+      "projectPath": "D:\\Project\\VSCode\\LMS Moodle\\streamingservice\\streamingservice.csproj",
+      "packagesPath": "C:\\Users\\saleh\\.nuget\\packages\\",
+      "outputPath": "D:\\Project\\VSCode\\LMS Moodle\\streamingservice\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+      ],
       "configFilePaths": [
-        "/root/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\saleh\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp3.1"
@@ -6210,7 +6214,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/3.1.404/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.300\\RuntimeIdentifierGraph.json"
       }
     }
   }
