@@ -1,12 +1,10 @@
-# docker build -t goldenstarc/bigbluebutton-livestreaming .
-# docker login
-# docker push goldenstarc/bigbluebutton-livestreaming
-# docker-compose up
 version: '3.3'
 services:
   bbb-streamer:
     image: goldenstarc/bigbluebutton-livestreaming
     container_name: liveStreaming-BBBMEETINGID
+    shm_size: '2gb'
+    network_mode: host
     environment:
       # BigBlueButton Server url:
       - BBB_URL=BBBURL
@@ -27,20 +25,17 @@ services:
       # play intro file (can be a local file in videodata folder e.g. /video/intro.mp4 or a url of a mediastream e.g. https://my.intro.stream)
       - BBB_INTRO=false
       # begin the intro at position (optional, e.g. 00:00:05)
-      - BBB_BEGIN_INTRO_AT=
+      - BBB_BEGIN_INTRO_AT=04:40
       # end intro after (optional, e.g. 01:00:00 - after one hour)
       - BBB_END_INTRO_AT=
-      # Live stream agent username
-      - BBB_USER_NAME=Live
-      # show or hide user chat in stream
-      - BBB_SHOW_CHAT=true
-      - BBB_ENABLE_CHAT=false
-      - BBB_REDIS_HOST=redis
-      - BBB_REDIS_CHANNEL=chat
-      - BBB_CHAT_NAME=Chat
       # Media server url:
-      - BBB_STREAM_URL=rtmp://live.vir-gol.ir/stream/BBBMEETINGID
-      # - BBB_STREAM_URL=rtmp://ib2.legace.ir:1936/stream/bbb-live-1
+      - BBB_STREAM_URL=rtmp://localhost/stream/BBBMEETINGID
+      # Resolution to be streamed/downloaded in format WxH (default 1920x1080)
+      - BBB_RESOLUTION=1920x1080
+      # stream video bitrate
+      - FFMPEG_STREAM_VIDEO_BITRATE=4000
+      # threads used for stream (0=auto)
+      - FFMPEG_STREAM_THREADS=0
       # Timezone (default: Europe/Vienna):
       - TZ=Iran/Tehran
     volumes:
