@@ -102,8 +102,7 @@ namespace streamingservice.Services
                 appDbContext.Meetings.Update(meeting);
                 await appDbContext.SaveChangesAsync();
 
-                string cd = ShellRunner.Execute("cd Rooms/" + meeting.MeetingId);
-                string dockerDown = ShellRunner.Execute("docker-compose down");
+                string dockerDown = ShellRunner.Execute("cd Rooms/" + meeting.MeetingId + " && docker-compose down");
                 Directory.Delete("./Rooms/" + meeting.MeetingId , true);
                 
                 return true;
