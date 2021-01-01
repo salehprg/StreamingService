@@ -34,7 +34,7 @@ namespace streamingservice.Helper
                 //Or
                 //getMeetingInfo?meetingID=123
                 //then add checksum=???? to the end
-                data = "/" + data;
+
                 string modifiedData = "";
                 if(data.IndexOf("?") != -1) // if has any query in data
                 {
@@ -50,7 +50,7 @@ namespace streamingservice.Helper
                 
                 checkSum = SHA1Creator.sha1Creator(data + bbbSecret);
 
-                Uri uri = new Uri (bbbUrl + modifiedData + "checksum=" + checkSum.ToLower() );
+                Uri uri = new Uri (bbbUrl + "/" + modifiedData + "checksum=" + checkSum.ToLower() );
                 return uri.AbsoluteUri;
                 
             }
