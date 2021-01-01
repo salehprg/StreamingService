@@ -102,8 +102,17 @@ namespace streamingservice.Services
                 appDbContext.Meetings.Update(meeting);
                 await appDbContext.SaveChangesAsync();
 
+                MeetingServicesModel servicesModel = appDbContext.Services.Where(x => x.Id == meeting.ServiceId).FirstOrDefault();
+                if(servicesModel != null)
+                {
+                    BBBApi bBBApi = new BBBApi(appDbContext , servicesModel.Service_URL , servicesModel.Service_Key);
+                    await bBBApi.EndRoom(meeting.MeetingId);
+                }
+
                 string dockerDown = ShellRunner.Execute("cd Rooms/" + meeting.MeetingId + " && docker-compose down");
-                Directory.Delete("./Rooms/" + meeting.MeetingId , true);
+
+                try
+                {Directory.Delete("Rooms/" + meeting.MeetingId , true);}catch(Exception ex){}
                 
                 return true;
             }

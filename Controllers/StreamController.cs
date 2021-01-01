@@ -111,12 +111,12 @@ namespace streamingservice.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EndStream(string roomId)
+        public async Task<IActionResult> EndStream(string meetingId)
         {
             try
             {
                 UserModel owner = userService.GetUserModel(User);   
-                Meeting meeting = appDbContext.Meetings.Where(x => x.MeetingId == roomId && x.OwnerId == owner.Id).FirstOrDefault();
+                Meeting meeting = appDbContext.Meetings.Where(x => x.MeetingId == meetingId && x.OwnerId == owner.Id).FirstOrDefault();
 
                 if(meeting == null)
                     return BadRequest(new Response{
@@ -124,10 +124,10 @@ namespace streamingservice.Controllers
                         Status = "Failed"
                     });
 
-                bool result = await StreamService.EndRoom(roomId);
+                bool result = await StreamService.EndRoom(meetingId);
 
                 return Ok(new Response{
-                        Status = Status.Success,
+                        Status = (result ? Status.Success : Status.Failed),
                         Data = new {
                             EndResult = result
                         }

@@ -51,7 +51,40 @@ namespace streamingservice.Helper
                 checkSum = SHA1Creator.sha1Creator(data + bbbSecret);
 
                 Uri uri = new Uri (bbbUrl + "/" + modifiedData + "checksum=" + checkSum.ToLower() );
-                return uri.AbsoluteUri;
+                if(joinRoom)
+                    return uri.AbsoluteUri;
+
+                HttpResponseMessage response = client.GetAsync(uri).Result;  // Send data then get response
+
+                try
+                {
+                    if (response.IsSuccessStatusCode)  
+                    {  
+                        XmlDocument xmlResponse = new XmlDocument();
+                        
+                        xmlResponse.Load(await response.Content.ReadAsStreamAsync());
+                        string jsonObj = JsonConvert.SerializeXmlNode(xmlResponse , Newtonsoft.Json.Formatting.None , true);
+
+                        if(jsonObj.Contains("?xml"))
+                        {
+                            string[] results = jsonObj.Split("}{");
+
+                            return "{" + results[1];
+                        }
+                        return jsonObj;
+                    }  
+                    else  
+                    {  
+                        Console.WriteLine("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase);  
+                        return "";
+                    } 
+                }
+                catch (System.Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    Console.WriteLine(ex.StackTrace);
+                    return null;
+                }
                 
             }
             catch
